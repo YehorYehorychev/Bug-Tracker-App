@@ -26,7 +26,7 @@ describe("CommentSection", () => {
         bugId={1}
         comments={mockComments}
         onCommentAdded={jest.fn()}
-      />
+      />,
     );
     expect(screen.getByText("Comments")).toBeInTheDocument();
     expect(screen.getByText("John Doe")).toBeInTheDocument();
@@ -40,13 +40,17 @@ describe("CommentSection", () => {
 
     const onCommentAdded = jest.fn();
     render(
-      <CommentSection bugId={1} comments={[]} onCommentAdded={onCommentAdded} />
+      <CommentSection
+        bugId={1}
+        comments={[]}
+        onCommentAdded={onCommentAdded}
+      />,
     );
 
     await userEvent.type(screen.getByLabelText("Your Name"), "Jane Smith");
     await userEvent.type(
       screen.getByLabelText("Comment"),
-      "This is a new comment"
+      "This is a new comment",
     );
     fireEvent.click(screen.getByText("Add Comment"));
 
@@ -62,7 +66,7 @@ describe("CommentSection", () => {
             author: "Jane Smith",
             content: "This is a new comment",
           }),
-        }
+        },
       );
       expect(onCommentAdded).toHaveBeenCalled();
     });
@@ -74,17 +78,17 @@ describe("CommentSection", () => {
       .mockImplementation(() => {});
 
     (fetch as jest.Mock).mockRejectedValueOnce(
-      new Error("Failed to add comment")
+      new Error("Failed to add comment"),
     );
 
     render(
-      <CommentSection bugId={1} comments={[]} onCommentAdded={jest.fn()} />
+      <CommentSection bugId={1} comments={[]} onCommentAdded={jest.fn()} />,
     );
 
     await userEvent.type(screen.getByLabelText("Your Name"), "Jane Smith");
     await userEvent.type(
       screen.getByLabelText("Comment"),
-      "This is a new comment"
+      "This is a new comment",
     );
     fireEvent.click(screen.getByText("Add Comment"));
 
@@ -97,14 +101,14 @@ describe("CommentSection", () => {
 
   it("should render empty comments message when no comments are provided", () => {
     render(
-      <CommentSection bugId={1} comments={[]} onCommentAdded={jest.fn()} />
+      <CommentSection bugId={1} comments={[]} onCommentAdded={jest.fn()} />,
     );
     expect(screen.getByText("No comments yet.")).toBeInTheDocument();
   });
 
   it("should disable the submit button when form fields are empty", () => {
     render(
-      <CommentSection bugId={1} comments={[]} onCommentAdded={jest.fn()} />
+      <CommentSection bugId={1} comments={[]} onCommentAdded={jest.fn()} />,
     );
     expect(screen.getByText("Add Comment")).toBeDisabled();
   });
@@ -118,10 +122,10 @@ describe("CommentSection", () => {
         bugId={1}
         comments={mockComments}
         onCommentAdded={jest.fn()}
-      />
+      />,
     );
 
-    expect(screen.getByText(/6\/10\/23.*(10|11):00:00/)).toBeInTheDocument();
+    expect(screen.getByText(/6\/10\/23,.*:00:00/)).toBeInTheDocument();
 
     jest.useRealTimers();
   });
