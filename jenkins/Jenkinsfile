@@ -9,17 +9,20 @@ pipeline {
                         docker {
                             image 'snakee/golang-junit:1.21'
                             reuseNode true
+                            args '-e GOCACHE=/tmp/go-cache -e GOPATH=/tmp/go'
                         }
                     }
                     steps {
                         dir('bugtracker-backend') {
                             sh '''
+                            export GOCACHE=/tmp/go-cache
+                            export GOPATH=/tmp/go
+                            
                             go test ./... -v 2>&1 | go-junit-report > test-results.xml
-
-                            # Generate coverage report
+                            
                             go test -coverprofile=coverage.out -covermode=atomic ./...
                             go tool cover -html=coverage.out -o coverage.html
-
+                            
                             mkdir -p reports
                             mv coverage.html reports/
                             '''
@@ -71,6 +74,18 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+        stage('Launch Application') {
+            agent {
+                docker {
+                    image 'docker:27.5.1'
+                    reuseNode true
+                    args '-v /var/run/docker.sock:/var/run/docker.sock -u 0'
+                }
+            }
+            steps {
+                sh 'docker compose up --build -d'
             }
         }
     }
