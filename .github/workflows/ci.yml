@@ -13,6 +13,9 @@ jobs:
   # Backend Unit Tests Job
   unit-tests-backend:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: read
     outputs:
       coverage: ${{ steps.test-backend.outputs.report }}
     steps:
@@ -57,6 +60,9 @@ jobs:
   # Frontend Unit Tests Job
   unit-tests-frontend:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: read
     outputs:
       coverage: ${{ steps.test-frontend.outputs.report }}
     steps:
@@ -126,6 +132,9 @@ jobs:
   api-tests:
     needs: [unit-tests-backend, unit-tests-frontend]
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: read
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
