@@ -128,8 +128,8 @@ jobs:
             ${{ needs.unit-tests-frontend.outputs.coverage }}
             ```
 
-  # API Tests
-  api-e2e-tests:
+  # API -> E2E -> Performance Tests
+  api-e2e-performance-tests:
     needs: [unit-tests-backend, unit-tests-frontend]
     runs-on: ubuntu-latest
     permissions:
@@ -159,6 +159,15 @@ jobs:
           npx playwright install
           npx playwright test
 
+      - name: Setup K6 for Performance Tests
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run Performance Tests
+        uses: grafana/run-k6-action@v1
+        with:
+          path: tests-perf/script.js
+          flags: --out json=summary.json
+
       - name: Shutdown Application
         if: always()
         run: docker compose down
@@ -187,6 +196,22 @@ jobs:
           path: ./tests-e2e/playwright-report
           retention-days: 5
 
+      - name: Upload Performance Test Raw Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-raw-results
+          path: summary.json
+          retention-days: 5
+
+      - name: Upload Performance HTML Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-report
+          path: perf-results.html
+          retention-days: 5
+
       - name: Publish API Test Results
         if: always()
         uses: dorny/test-reporter@v1
@@ -200,7 +225,7 @@ jobs:
         if: always()
         uses: dorny/test-reporter@v1
         with:
-          name: API Tests Report
+          name: E2E Tests Report
           path: tests-e2e/test-results/results.xml
           reporter: jest-junit
           fail-on-error: false
