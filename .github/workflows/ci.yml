@@ -229,3 +229,103 @@ jobs:
           path: tests-e2e/test-results/results.xml
           reporter: jest-junit
           fail-on-error: false
+
+  # deploy-staging:
+  #   needs: [api-e2e-performance-tests]
+  #   # if: github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Setup Flyctl
+  #       uses: superfly/flyctl-actions/setup-flyctl@master
+
+  #     - name: Deploy Backend
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  #       working-directory: ./bugtracker-backend
+  #       run: flyctl deploy -c fly.staging.toml --remote-only
+
+  #     - name: Deploy Frontend
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  #       working-directory: ./bugtracker-frontend
+  #       run: flyctl deploy -c fly.staging.toml --remote-only
+
+  # post-deployment-tests:
+  #   needs: [deploy-staging]
+  #   # if: github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     checks: write
+  #     pull-requests: read
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+
+  #     - name: Install Playwright
+  #       run: |
+  #         npm install -g playwright
+  #         npx playwright install --with-deps
+
+  #     - name: Run Post Deployment E2E Tests
+  #       working-directory: ./tests-e2e
+  #       env:
+  #         STAGING_URL: https://your-staging-app.fly.dev
+  #       run: |
+  #         npm ci
+  #         npx playwright test --config=playwright.staging.config.ts
+
+  #     - name: Upload Test Results
+  #       if: always()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: post-deployment-test-results
+  #         path: ./tests-e2e/test-results
+  #         retention-days: 5
+
+  #     - name: Upload Playwright Report
+  #       if: always()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: post-deployment-playwright-report
+  #         path: ./tests-e2e/playwright-report
+  #         retention-days: 5
+
+  #     - name: Publish Post Deployment Test Results
+  #       if: always()
+  #       uses: dorny/test-reporter@v1
+  #       with:
+  #         name: Post Deployment Tests Report
+  #         path: tests-e2e/test-results/results.xml
+  #         reporter: jest-junit
+  #         fail-on-error: false
+
+  # deploy-production:
+  #   needs: [post-deployment-tests]
+  #   # if: github.ref == 'refs/heads/main'
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: production
+  #     url: https://your-production-app.fly.dev
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Setup Flyctl
+  #       uses: superfly/flyctl-actions/setup-flyctl@master
+
+  #     - name: Deploy Backend to Production
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  #       working-directory: ./bugtracker-backend
+  #       run: flyctl deploy -c fly.production.toml --remote-only
+
+  #     - name: Deploy Frontend to Production
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  #       working-directory: ./bugtracker-frontend
+  #       run: flyctl deploy -c fly.production.toml --remote-only
