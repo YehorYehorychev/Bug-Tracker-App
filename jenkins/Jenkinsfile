@@ -17,12 +17,12 @@ pipeline {
                             sh '''
                             export GOCACHE=/tmp/go-cache
                             export GOPATH=/tmp/go
-                            
+
                             go test ./... -v 2>&1 | go-junit-report > test-results.xml
-                            
+
                             go test -coverprofile=coverage.out -covermode=atomic ./...
                             go tool cover -html=coverage.out -o coverage.html
-                            
+
                             mkdir -p reports
                             mv coverage.html reports/
                             '''
@@ -176,6 +176,42 @@ pipeline {
                 }
             }
         }
+        // stage('Deploy Staging') {
+        //     when {
+        //         expression {
+        //             return env.GIT_BRANCH == 'origin/main'
+        //         }
+        //     }
+        //     environment {
+        //         FLY_API_TOKEN = credentials('FLY_API_TOKEN')
+        //         FLYCTL_INSTALL = "${env.WORKSPACE.replaceAll(' ', '')}/.fly"
+        //         PATH = "$FLYCTL_INSTALL/bin:$PATH"
+        //         HOME = "${WORKSPACE}"
+        //     }
+        //     stages {
+        //         stage('Install Flyctl') {
+        //             steps {
+        //                 sh 'mkdir -p $FLYCTL_INSTALL'
+        //                 sh 'curl -L https://fly.io/install.sh | sh'
+        //                 sh 'flyctl version'
+        //             }
+        //         }
+        //         stage('Deploy Backend') {
+        //             steps {
+        //                 dir('bugtracker-backend') {
+        //                     sh 'flyctl deploy -c fly.staging.toml --remote-only'
+        //                 }
+        //             }
+        //         }
+        //         stage('Deploy Frontend') {
+        //             steps {
+        //                 dir('bugtracker-frontend') {
+        //                     sh 'flyctl deploy -c fly.staging.toml --remote-only'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
     post {
         always {
