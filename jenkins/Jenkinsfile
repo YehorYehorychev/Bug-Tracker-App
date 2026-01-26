@@ -212,6 +212,85 @@ pipeline {
         //         }
         //     }
         // }
+        // stage('Post Deployment Tests') {
+        //     when {
+        //         expression {
+        //             return env.GIT_BRANCH == 'origin/main'
+        //         }
+        //     }
+        //     agent {
+        //         docker {
+        //             image 'mcr.microsoft.com/playwright:v1.50.0-jammy'
+        //             reuseNode true
+        //             args '-u 0'
+        //         }
+        //     }
+        //     environment {
+        //         STAGING_URL = 'https://your-staging-app.fly.dev'
+        //     }
+        //     steps {
+        //         dir('tests-e2e') {
+        //             sh '''
+        //             npm ci
+        //             npx playwright test --config=playwright.staging.config.ts
+        //             '''
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             junit 'tests-e2e/test-results/results.xml'
+        //             publishHTML(target: [
+        //                 allowMissing: false,
+        //                 alwaysLinkToLastBuild: true,
+        //                 keepAll: true,
+        //                 reportDir: 'tests-e2e/playwright-report',
+        //                 reportFiles: 'index.html',
+        //                 reportName: 'Post Deployment Test Report'
+        //             ])
+        //         }
+        //     }
+        // }
+        // stage('Deploy Production') {
+        //     when {
+        //         expression {
+        //             return env.GIT_BRANCH == 'origin/main'
+        //         }
+        //     }
+        //     environment {
+        //         FLY_API_TOKEN = credentials('FLY_API_TOKEN')
+        //         FLYCTL_INSTALL = "${env.WORKSPACE.replaceAll(' ', '')}/.fly"
+        //         PATH = "$FLYCTL_INSTALL/bin:$PATH"
+        //         HOME = "${WORKSPACE}"
+        //     }
+        //     stages {
+        //         stage('Manual Approval') {
+        //             steps {
+        //                 input message: 'Deploy to Production?', ok: 'Deploy'
+        //             }
+        //         }
+        //         stage('Install Flyctl') {
+        //             steps {
+        //                 sh 'mkdir -p $FLYCTL_INSTALL'
+        //                 sh 'curl -L https://fly.io/install.sh | sh'
+        //                 sh 'flyctl version'
+        //             }
+        //         }
+        //         stage('Deploy Backend to Production') {
+        //             steps {
+        //                 dir('bugtracker-backend') {
+        //                     sh 'flyctl deploy -c fly.production.toml --remote-only'
+        //                 }
+        //             }
+        //         }
+        //         stage('Deploy Frontend to Production') {
+        //             steps {
+        //                 dir('bugtracker-frontend') {
+        //                     sh 'flyctl deploy -c fly.production.toml --remote-only'
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
     }
     post {
         always {
